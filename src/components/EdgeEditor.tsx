@@ -4,8 +4,7 @@ import {
   DndContext,
   DragOverlay,
   KeyboardSensor,
-  MouseSensor,
-  TouchSensor,
+  PointerSensor,
   useDroppable,
   useSensor,
   useSensors,
@@ -43,13 +42,10 @@ export function EdgeEditor({
 }: EdgeEditorProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const sensors = useSensors(
-    // Mouse: a small drag starts reordering; a plain click flips direction.
-    useSensor(MouseSensor, { activationConstraint: { distance: 6 } }),
-    // Touch: press-and-hold to drag, quick tap to flip. The delay (plus
-    // `touch-action: none` on chips) keeps drags from fighting page scroll.
-    useSensor(TouchSensor, {
-      activationConstraint: { delay: 180, tolerance: 8 },
-    }),
+    // One unified sensor for mouse + touch + pen. A small move starts a drag
+    // (reorder); a stationary press fires onClick (flip direction). Chips set
+    // `touch-action: none`, so a touch-drag won't be hijacked by page scroll.
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
 
