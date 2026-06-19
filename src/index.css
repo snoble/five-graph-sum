@@ -1,0 +1,375 @@
+:root {
+  --bg: #0f1117;
+  --panel: #171a23;
+  --panel-2: #1f2330;
+  --border: #2a2f3d;
+  --text: #e6e8ee;
+  --muted: #9aa1b2;
+  --accent: #6ea8fe;
+  --accent-2: #b794f6;
+  --edge-potential: #2a2f3d;
+  --edge-active: #6ea8fe;
+  --seed: #f6c177;
+  --max: #8be9a0;
+  --target: #50fa7b;
+  --danger: #ff6b6b;
+  --error-bg: #3a1d22;
+  --error-border: #ff6b6b;
+
+  color-scheme: dark;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.app {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.app-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.app-header h1 {
+  margin: 0 0 4px;
+  font-size: 22px;
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  max-width: 640px;
+}
+
+.subtitle code {
+  background: var(--panel-2);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 6px 12px;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+button:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #0b1020;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+button.danger:hover:not(:disabled) {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card-error {
+  border-color: var(--error-border);
+  box-shadow: 0 0 0 1px var(--error-border) inset;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.name-input {
+  flex: 1;
+  font: inherit;
+  font-weight: 600;
+  background: transparent;
+  color: var(--text);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 6px 8px;
+}
+
+.name-input:hover,
+.name-input:focus {
+  border-color: var(--border);
+  outline: none;
+  background: var(--panel-2);
+}
+
+.card-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.card-actions button {
+  padding: 4px 10px;
+  font-size: 13px;
+}
+
+.seed-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.seed-label {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.seed-btn {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  font-weight: 600;
+}
+
+.seed-btn.active {
+  background: var(--seed);
+  border-color: var(--seed);
+  color: #2a1d05;
+}
+
+.graph {
+  width: 100%;
+  height: auto;
+  background: var(--panel-2);
+  border-radius: 10px;
+}
+
+.edge-potential {
+  stroke: var(--edge-potential);
+  stroke-width: 1.5;
+}
+
+.edge-active {
+  stroke: var(--edge-active);
+  stroke-width: 2.5;
+}
+
+.edge-last {
+  stroke: var(--accent-2);
+}
+
+.edge-order-bg {
+  fill: var(--bg);
+  stroke: var(--edge-active);
+  stroke-width: 1;
+}
+
+.edge-order-text {
+  fill: var(--text);
+  font-size: 10px;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.node circle {
+  fill: var(--panel);
+  stroke: var(--border);
+  stroke-width: 2;
+}
+
+.node-seed circle {
+  stroke: var(--seed);
+}
+
+.node-max circle {
+  stroke: var(--max);
+}
+
+.node-target circle {
+  fill: #163d24;
+  stroke: var(--target);
+  stroke-width: 3;
+}
+
+.node-changed circle {
+  stroke-width: 3.5;
+}
+
+.node-label {
+  fill: var(--text);
+  font-size: 12px;
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.node-value {
+  fill: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  text-anchor: middle;
+  dominant-baseline: central;
+  font-variant-numeric: tabular-nums;
+}
+
+.node-final {
+  fill: var(--muted);
+  font-size: 9px;
+  text-anchor: middle;
+  dominant-baseline: central;
+  font-variant-numeric: tabular-nums;
+}
+
+.node-max .node-value {
+  fill: var(--max);
+  font-weight: 700;
+}
+
+.scrubber {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.scrubber input[type="range"] {
+  flex: 1;
+  accent-color: var(--accent);
+}
+
+.scrubber button {
+  width: 32px;
+  padding: 4px 0;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.step-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.edge-tag {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1px 8px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+.edges-input {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  resize: vertical;
+  width: 100%;
+}
+
+.edges-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.edges-input.has-error {
+  border-color: var(--error-border);
+}
+
+.stats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.max-pill {
+  font-weight: 600;
+  font-size: 13px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+}
+
+.max-pill.win {
+  background: #163d24;
+  border-color: var(--target);
+  color: var(--target);
+}
+
+.max-pill.over {
+  border-color: var(--seed);
+  color: var(--seed);
+}
+
+.error-pill {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--error-bg);
+  border: 1px solid var(--error-border);
+  color: var(--danger);
+}
+
+.error-list {
+  margin: 0;
+  padding: 10px 12px 10px 28px;
+  background: var(--error-bg);
+  border: 1px solid var(--error-border);
+  border-radius: 10px;
+  font-size: 13px;
+  color: #ffd9d9;
+}
+
+.error-list li {
+  margin: 2px 0;
+}
