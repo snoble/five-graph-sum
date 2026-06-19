@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { Ordering } from "../types";
 import {
+  Edge,
   NODE_LABELS,
   TARGET,
-  maxValue,
-  parse,
+  propagationAmounts,
   simulate,
+  sumValues,
 } from "../puzzle";
 import { GraphView } from "./GraphView";
+import { EdgeEditor } from "./EdgeEditor";
 
 interface OrderingCardProps {
   ordering: Ordering;
@@ -22,27 +24,26 @@ export function OrderingCard({
   onClone,
   onDelete,
 }: OrderingCardProps) {
-  const parsed = parse(ordering.text);
-  const total = parsed.applied.length;
+  const sequence: readonly Edge[] = [...ordering.left, ...ordering.right];
+  const total = sequence.length;
 
-  // Raw scrubber position; clamp on read so edits to the text can't push it
-  // out of range. No effect needed -- this is just derived state.
-  const [rawStep, setStep] = useState(total);
+  // Raw scrubber position. Default (Infinity) pins to the final state and keeps
+  // following the end; once the user scrubs, it sticks. Clamp on read.
+  const [rawStep, setStep] = useState(Number.POSITIVE_INFINITY);
   const step = Math.min(rawStep, total);
 
-  const values = simulate(parsed.applied, ordering.seed, step);
-  const finalValues = simulate(parsed.applied, ordering.seed, total);
-  const max = maxValue(finalValues);
-  const won = finalValues.some((v) => v === TARGET);
-  const overshot = max > TARGET;
+  const values = simulate(sequence, ordering.seed, step);
+  const finalValues = simulate(sequence, ordering.seed, total);
+  const amounts = propagationAmounts(sequence, ordering.seed);
+  const sum = sumValues(finalValues);
+  const won = sum === TARGET;
+  const overshot = sum > TARGET;
 
-  const currentEdge = step > 0 ? parsed.applied[step - 1] : null;
+  const currentEdge = step > 0 ? sequence[step - 1] : null;
   const changedNode = currentEdge ? currentEdge.to : null;
 
-  const errors = parsed.lines.filter((l) => l.error);
-
   return (
-    <section className={`card${parsed.hasError ? " card-error" : ""}`}>
+    <section className="card">
       <header className="card-header">
         <input
           className="name-input"
@@ -79,17 +80,18 @@ export function OrderingCard({
       </div>
 
       <GraphView
-        applied={parsed.applied}
+        edges={sequence}
         step={step}
         values={values}
         finalValues={finalValues}
+        amounts={amounts}
         seed={ordering.seed}
         changedNode={changedNode}
       />
 
       <div className="scrubber">
         <button
-          onClick={() => setStep((s) => Math.max(0, s - 1))}
+          onClick={() => setStep(Math.max(0, step - 1))}
           disabled={step === 0}
           aria-label="Previous step"
         >
@@ -103,7 +105,7 @@ export function OrderingCard({
           onChange={(e) => setStep(Number(e.target.value))}
         />
         <button
-          onClick={() => setStep((s) => Math.min(total, s + 1))}
+          onClick={() => setStep(Math.min(total, step + 1))}
           disabled={step === total}
           aria-label="Next step"
         >
@@ -119,36 +121,20 @@ export function OrderingCard({
         )}
       </div>
 
-      <textarea
-        className={`edges-input${parsed.hasError ? " has-error" : ""}`}
-        name={`edges-${ordering.id}`}
-        value={ordering.text}
-        spellCheck={false}
-        placeholder={"One edge per line, e.g.\nAB\nBC\nCA"}
-        onChange={(e) => onPatch({ text: e.target.value })}
-        rows={8}
+      <EdgeEditor
+        left={ordering.left}
+        right={ordering.right}
+        amounts={amounts}
+        onChange={(left, right) => onPatch({ left, right })}
       />
 
       <div className="stats">
         <span className={`max-pill${won ? " win" : overshot ? " over" : ""}`}>
-          max {max} / {TARGET}
+          sum {sum} / {TARGET}
           {won && " ✓"}
           {overshot && " (over)"}
         </span>
-        {parsed.hasError && (
-          <span className="error-pill">illegal state</span>
-        )}
       </div>
-
-      {errors.length > 0 && (
-        <ul className="error-list">
-          {errors.map((l) => (
-            <li key={l.lineIndex}>
-              Line {l.lineIndex + 1}: {l.error!.message}
-            </li>
-          ))}
-        </ul>
-      )}
     </section>
   );
 }

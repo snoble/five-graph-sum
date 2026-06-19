@@ -113,11 +113,6 @@ button.danger:hover:not(:disabled) {
   gap: 12px;
 }
 
-.card-error {
-  border-color: var(--error-border);
-  box-shadow: 0 0 0 1px var(--error-border) inset;
-}
-
 .card-header {
   display: flex;
   align-items: center;
@@ -198,17 +193,23 @@ button.danger:hover:not(:disabled) {
   stroke: var(--accent-2);
 }
 
-.edge-order-bg {
+.edge-label-bg {
   fill: var(--bg);
   stroke: var(--edge-active);
   stroke-width: 1;
 }
 
-.edge-order-text {
+.edge-label-last {
+  stroke: var(--accent-2);
+}
+
+.edge-label-text {
   fill: var(--text);
   font-size: 10px;
+  font-weight: 600;
   text-anchor: middle;
   dominant-baseline: central;
+  font-variant-numeric: tabular-nums;
 }
 
 .node circle {
@@ -221,17 +222,8 @@ button.danger:hover:not(:disabled) {
   stroke: var(--seed);
 }
 
-.node-max circle {
-  stroke: var(--max);
-}
-
-.node-target circle {
-  fill: #163d24;
-  stroke: var(--target);
-  stroke-width: 3;
-}
-
 .node-changed circle {
+  stroke: var(--accent-2);
   stroke-width: 3.5;
 }
 
@@ -260,10 +252,6 @@ button.danger:hover:not(:disabled) {
   font-variant-numeric: tabular-nums;
 }
 
-.node-max .node-value {
-  fill: var(--max);
-  font-weight: 700;
-}
 
 .scrubber {
   display: flex;
@@ -300,28 +288,83 @@ button.danger:hover:not(:disabled) {
   color: var(--text);
 }
 
-.edges-input {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 14px;
-  line-height: 1.6;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  background: var(--panel-2);
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 10px 12px;
-  resize: vertical;
-  width: 100%;
+.editor {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
 }
 
-.edges-input:focus {
-  outline: none;
+.col-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 56px;
+  padding: 6px;
+  background: var(--panel-2);
+  border: 1px dashed transparent;
+  border-radius: 10px;
+}
+
+.col-list.over {
+  border-color: var(--accent);
+  background: #1b2233;
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+
+.chip:hover {
   border-color: var(--accent);
 }
 
-.edges-input.has-error {
-  border-color: var(--error-border);
+.chip.dragging {
+  cursor: grabbing;
+  border-color: var(--accent-2);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+}
+
+.chip-order {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 6px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+.chip-edge {
+  flex: 1;
+  font-weight: 700;
+  letter-spacing: 1px;
+  font-variant-numeric: tabular-nums;
+}
+
+.chip-arrow {
+  margin: 0 3px;
+  color: var(--accent);
+}
+
+.chip-amt {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--max);
 }
 
 .stats {
@@ -351,25 +394,3 @@ button.danger:hover:not(:disabled) {
   color: var(--seed);
 }
 
-.error-pill {
-  font-size: 12px;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: var(--error-bg);
-  border: 1px solid var(--error-border);
-  color: var(--danger);
-}
-
-.error-list {
-  margin: 0;
-  padding: 10px 12px 10px 28px;
-  background: var(--error-bg);
-  border: 1px solid var(--error-border);
-  border-radius: 10px;
-  font-size: 13px;
-  color: #ffd9d9;
-}
-
-.error-list li {
-  margin: 2px 0;
-}

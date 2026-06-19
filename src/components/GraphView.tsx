@@ -1,12 +1,15 @@
-import { AppliedEdge, NODE_COUNT, NODE_LABELS, TARGET } from "../puzzle";
+import { ALL_PAIRS, Edge, NODE_COUNT, NODE_LABELS, pairKey } from "../puzzle";
 
 interface GraphViewProps {
-  applied: readonly AppliedEdge[];
+  /** Edges in application order. */
+  edges: readonly Edge[];
   step: number;
   /** Node values at the current scrub step. */
   values: readonly number[];
   /** Node values after every edge is applied. */
   finalValues: readonly number[];
+  /** Amount each edge propagates, indexed parallel to `edges`. */
+  amounts: readonly number[];
   seed: number;
   /** Node index whose value just changed at the current step, if any. */
   changedNode: number | null;
@@ -18,7 +21,6 @@ const RADIUS = 120;
 const NODE_R = 24;
 
 function nodePos(i: number): { x: number; y: number } {
-  // Start at top, go clockwise.
   const angle = (-90 + i * (360 / NODE_COUNT)) * (Math.PI / 180);
   return {
     x: CENTER + RADIUS * Math.cos(angle),
@@ -44,27 +46,17 @@ function trimToNodes(
   };
 }
 
-const ALL_PAIRS: ReadonlyArray<readonly [number, number]> = Array.from(
-  { length: NODE_COUNT },
-  (_, a) => a,
-).flatMap((a) =>
-  Array.from(
-    { length: NODE_COUNT - a - 1 },
-    (_, k) => [a, a + 1 + k] as const,
-  ),
-);
-
 export function GraphView({
-  applied,
+  edges,
   step,
   values,
   finalValues,
+  amounts,
   seed,
   changedNode,
 }: GraphViewProps) {
   const positions = NODE_LABELS.map((_, i) => nodePos(i));
-  const visibleEdges = applied.slice(0, step);
-  const maxVal = values.reduce((m, v) => (v > m ? v : m), 0);
+  const visibleEdges = edges.slice(0, step);
 
   return (
     <svg
@@ -102,14 +94,17 @@ export function GraphView({
         );
       })}
 
-      {/* Applied edges, with direction + order label */}
-      {visibleEdges.map((e) => {
+      {/* Applied edges, with direction + order: +amount label */}
+      {visibleEdges.map((e, idx) => {
         const seg = trimToNodes(positions[e.from], positions[e.to]);
         const mx = (seg.x1 + seg.x2) / 2;
         const my = (seg.y1 + seg.y2) / 2;
-        const isLast = e.order === step;
+        const order = idx + 1;
+        const isLast = order === step;
+        const label = `${order}: +${amounts[idx] ?? 0}`;
+        const w = label.length * 6.2 + 8;
         return (
-          <g key={`a-${e.lineIndex}-${e.order}`}>
+          <g key={`a-${pairKey(e.from, e.to)}`}>
             <line
               x1={seg.x1}
               y1={seg.y1}
@@ -118,9 +113,18 @@ export function GraphView({
               className={isLast ? "edge-active edge-last" : "edge-active"}
               markerEnd="url(#arrow)"
             />
-            <circle cx={mx} cy={my} r={9} className="edge-order-bg" />
-            <text x={mx} y={my} className="edge-order-text">
-              {e.order}
+            <rect
+              x={mx - w / 2}
+              y={my - 8}
+              width={w}
+              height={16}
+              rx={8}
+              className={
+                isLast ? "edge-label-bg edge-label-last" : "edge-label-bg"
+              }
+            />
+            <text x={mx} y={my} className="edge-label-text">
+              {label}
             </text>
           </g>
         );
@@ -128,12 +132,8 @@ export function GraphView({
 
       {/* Nodes */}
       {positions.map((p, i) => {
-        const isMax = values[i] === maxVal && maxVal > 0;
-        const hitTarget = values[i] === TARGET;
         const classes = ["node"];
         if (i === seed) classes.push("node-seed");
-        if (isMax) classes.push("node-max");
-        if (hitTarget) classes.push("node-target");
         if (i === changedNode) classes.push("node-changed");
         return (
           <g key={`n-${i}`} className={classes.join(" ")}>

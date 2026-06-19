@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { initialColumns } from "./puzzle";
 import { Ordering } from "./types";
 
 function makeId(): string {
@@ -7,7 +8,7 @@ function makeId(): string {
 }
 
 function makeOrdering(name: string): Ordering {
-  return { id: makeId(), name, seed: 0, text: "" };
+  return { id: makeId(), name, seed: 0, ...initialColumns() };
 }
 
 interface StoreState {
@@ -44,7 +45,16 @@ export const useStore = create<StoreState>()(
         set((s) => ({
           orderings: s.orderings.flatMap((o) =>
             o.id === id
-              ? [o, { ...o, id: makeId(), name: `${o.name} (copy)` }]
+              ? [
+                  o,
+                  {
+                    ...o,
+                    id: makeId(),
+                    name: `${o.name} (copy)`,
+                    left: o.left.map((e) => ({ ...e })),
+                    right: o.right.map((e) => ({ ...e })),
+                  },
+                ]
               : [o],
           ),
         })),
@@ -60,6 +70,6 @@ export const useStore = create<StoreState>()(
       patch: (id, fields) =>
         set((s) => ({ orderings: mapOrdering(s.orderings, id, fields) })),
     }),
-    { name: "five-graph-orderings-v1" },
+    { name: "five-graph-orderings-v2" },
   ),
 );
