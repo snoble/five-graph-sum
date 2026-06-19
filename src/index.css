@@ -185,6 +185,15 @@ button.danger:hover:not(:disabled) {
   stroke-width: 1.5;
 }
 
+.edge-group {
+  cursor: pointer;
+}
+
+.edge-hit {
+  stroke: transparent;
+  stroke-width: 16;
+}
+
 .edge-active {
   stroke: var(--edge-active);
   stroke-width: 2.5;
@@ -192,6 +201,17 @@ button.danger:hover:not(:disabled) {
 
 .edge-last {
   stroke: var(--accent-2);
+}
+
+/* Declared after edge-active/edge-last so selection wins on equal specificity. */
+.edge-selected {
+  stroke: var(--seed);
+  stroke-width: 4;
+}
+
+.edge-label-selected {
+  stroke: var(--seed);
+  stroke-width: 1.5;
 }
 
 .edge-label-bg {
@@ -328,6 +348,12 @@ button.danger:hover:not(:disabled) {
 
 .chip:hover {
   border-color: var(--accent);
+}
+
+.chip.selected {
+  border-color: var(--seed);
+  box-shadow: 0 0 0 1px var(--seed);
+  background: #2a230f;
 }
 
 .chip.dragging {

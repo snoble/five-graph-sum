@@ -29,10 +29,18 @@ interface EdgeEditorProps {
   right: readonly Edge[];
   /** Propagation amount per edge in application order (left then right). */
   amounts: readonly number[];
+  /** pairKey of the edge selected in the graph, highlighted here. */
+  selectedId: string | null;
   onChange: (left: Edge[], right: Edge[]) => void;
 }
 
-export function EdgeEditor({ left, right, amounts, onChange }: EdgeEditorProps) {
+export function EdgeEditor({
+  left,
+  right,
+  amounts,
+  selectedId,
+  onChange,
+}: EdgeEditorProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const sensors = useSensors(
     // Mouse: a small drag starts reordering; a plain click flips direction.
@@ -127,6 +135,7 @@ export function EdgeEditor({ left, right, amounts, onChange }: EdgeEditorProps) 
           edgeById={edgeById}
           orderOf={orderOf}
           amounts={amounts}
+          selectedId={selectedId}
           onReverse={reverseOne}
         />
         <Column
@@ -135,6 +144,7 @@ export function EdgeEditor({ left, right, amounts, onChange }: EdgeEditorProps) 
           edgeById={edgeById}
           orderOf={orderOf}
           amounts={amounts}
+          selectedId={selectedId}
           onReverse={reverseOne}
         />
       </div>
@@ -159,10 +169,19 @@ interface ColumnProps {
   edgeById: Map<string, Edge>;
   orderOf: Map<string, number>;
   amounts: readonly number[];
+  selectedId: string | null;
   onReverse: (id: string) => void;
 }
 
-function Column({ id, ids, edgeById, orderOf, amounts, onReverse }: ColumnProps) {
+function Column({
+  id,
+  ids,
+  edgeById,
+  orderOf,
+  amounts,
+  selectedId,
+  onReverse,
+}: ColumnProps) {
   const { setNodeRef, isOver } = useDroppable({ id });
   return (
     <SortableContext items={ids} strategy={verticalListSortingStrategy}>
@@ -176,6 +195,7 @@ function Column({ id, ids, edgeById, orderOf, amounts, onReverse }: ColumnProps)
               edge={edgeById.get(id)!}
               order={order}
               amount={amounts[order - 1] ?? 0}
+              selected={id === selectedId}
               onReverse={onReverse}
             />
           );
@@ -190,10 +210,11 @@ interface EdgeChipProps {
   edge: Edge;
   order: number;
   amount: number;
+  selected: boolean;
   onReverse: (id: string) => void;
 }
 
-function EdgeChip({ id, edge, order, amount, onReverse }: EdgeChipProps) {
+function EdgeChip({ id, edge, order, amount, selected, onReverse }: EdgeChipProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id });
   const style = {
@@ -205,7 +226,7 @@ function EdgeChip({ id, edge, order, amount, onReverse }: EdgeChipProps) {
     <div
       ref={setNodeRef}
       style={style}
-      className="chip"
+      className={`chip${selected ? " selected" : ""}`}
       {...attributes}
       {...listeners}
       onClick={() => onReverse(id)}

@@ -13,6 +13,9 @@ interface GraphViewProps {
   seed: number;
   /** Node index whose value just changed at the current step, if any. */
   changedNode: number | null;
+  /** pairKey of the currently selected edge, if any. */
+  selectedId: string | null;
+  onSelectEdge: (id: string) => void;
 }
 
 const SIZE = 320;
@@ -54,6 +57,8 @@ export function GraphView({
   amounts,
   seed,
   changedNode,
+  selectedId,
+  onSelectEdge,
 }: GraphViewProps) {
   const positions = NODE_LABELS.map((_, i) => nodePos(i));
   const visibleEdges = edges.slice(0, step);
@@ -101,16 +106,32 @@ export function GraphView({
         const my = (seg.y1 + seg.y2) / 2;
         const order = idx + 1;
         const isLast = order === step;
+        const id = pairKey(e.from, e.to);
+        const selected = id === selectedId;
         const label = `${order}: +${amounts[idx] ?? 0}`;
         const w = label.length * 6.2 + 8;
+        const lineClass = ["edge-active"];
+        if (isLast) lineClass.push("edge-last");
+        if (selected) lineClass.push("edge-selected");
         return (
-          <g key={`a-${pairKey(e.from, e.to)}`}>
+          <g
+            key={`a-${id}`}
+            className="edge-group"
+            onClick={() => onSelectEdge(id)}
+          >
             <line
               x1={seg.x1}
               y1={seg.y1}
               x2={seg.x2}
               y2={seg.y2}
-              className={isLast ? "edge-active edge-last" : "edge-active"}
+              className="edge-hit"
+            />
+            <line
+              x1={seg.x1}
+              y1={seg.y1}
+              x2={seg.x2}
+              y2={seg.y2}
+              className={lineClass.join(" ")}
               markerEnd="url(#arrow)"
             />
             <rect
@@ -119,9 +140,9 @@ export function GraphView({
               width={w}
               height={16}
               rx={8}
-              className={
-                isLast ? "edge-label-bg edge-label-last" : "edge-label-bg"
-              }
+              className={`edge-label-bg${isLast ? " edge-label-last" : ""}${
+                selected ? " edge-label-selected" : ""
+              }`}
             />
             <text x={mx} y={my} className="edge-label-text">
               {label}

@@ -32,6 +32,9 @@ export function OrderingCard({
   const [rawStep, setStep] = useState(Number.POSITIVE_INFINITY);
   const step = Math.min(rawStep, total);
 
+  // pairKey of the edge selected by clicking it in the graph.
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+
   const values = simulate(sequence, ordering.seed, step);
   const finalValues = simulate(sequence, ordering.seed, total);
   const amounts = propagationAmounts(sequence, ordering.seed);
@@ -87,6 +90,10 @@ export function OrderingCard({
         amounts={amounts}
         seed={ordering.seed}
         changedNode={changedNode}
+        selectedId={selectedId}
+        onSelectEdge={(id) =>
+          setSelectedId((prev) => (prev === id ? null : id))
+        }
       />
 
       <div className="scrubber">
@@ -125,6 +132,7 @@ export function OrderingCard({
         left={ordering.left}
         right={ordering.right}
         amounts={amounts}
+        selectedId={selectedId}
         onChange={(left, right) => onPatch({ left, right })}
       />
 
