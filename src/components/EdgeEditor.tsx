@@ -57,8 +57,12 @@ export function EdgeEditor({ left, right, amounts, onChange }: EdgeEditorProps) 
     return null;
   }
 
+  // Keep the global order (left then right) but re-split evenly so the two
+  // columns stay balanced after a cross-column drop.
   function commit(next: Record<ColId, string[]>) {
-    onChange(idsToEdges(next.left), idsToEdges(next.right));
+    const seq = [...next.left, ...next.right];
+    const half = Math.ceil(seq.length / 2);
+    onChange(idsToEdges(seq.slice(0, half)), idsToEdges(seq.slice(half)));
   }
 
   function reverseOne(id: string) {
