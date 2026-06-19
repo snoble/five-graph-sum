@@ -3,7 +3,9 @@ import {
   closestCorners,
   DndContext,
   DragOverlay,
-  PointerSensor,
+  KeyboardSensor,
+  MouseSensor,
+  TouchSensor,
   useDroppable,
   useSensor,
   useSensors,
@@ -13,6 +15,7 @@ import {
 import {
   arrayMove,
   SortableContext,
+  sortableKeyboardCoordinates,
   useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
@@ -32,7 +35,14 @@ interface EdgeEditorProps {
 export function EdgeEditor({ left, right, amounts, onChange }: EdgeEditorProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    // Mouse: a small drag starts reordering; a plain click flips direction.
+    useSensor(MouseSensor, { activationConstraint: { distance: 6 } }),
+    // Touch: press-and-hold to drag, quick tap to flip. The delay (plus
+    // `touch-action: none` on chips) keeps drags from fighting page scroll.
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 180, tolerance: 8 },
+    }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
 
   const edgeById = new Map<string, Edge>(
